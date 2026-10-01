@@ -28,7 +28,6 @@ backups/
 # Maven
 target/
 dist/
-config/
 
 # JetBrains IDE
 .idea/
