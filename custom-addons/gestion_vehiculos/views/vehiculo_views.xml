@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vista Kanban (Vehículos) -->
+    <record id="view_gestion_vehiculo_kanban" model="ir.ui.view">
+        <field name="name">gestion.vehiculo.kanban</field>
+        <field name="model">gestion.vehiculo</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" sample="1" default_group_by="estado">
+                <field name="estado"/>
+                <field name="currency_id"/>
+                <!-- Se agrega el campo computado para usarlo en el template -->
+                <field name="mantenimiento_count"/>
+                <field name="costo_total_mantenimiento"/>
+                <field name="promedio_mantenimiento"/>
+                <templates>
+                    <t t-name="card" class="flex-row">
+                        <aside class="d-flex align-items-center me-3 flex-shrink-0">
+                            <field name="image_1920" widget="image" options="{'img_class': 'o_image_64_contain rounded'}" alt="Foto del Vehículo"/>
+                        </aside>
+                        <main class="flex-grow-1 d-flex flex-column justify-content-between">
+                            <div>
+                                <strong class="o_kanban_record_title fs-5">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="text-muted">
+                                    <field name="marca"/> <field name="modelo"/>
+                                </div>
+                                <div t-if="record.conductor_id.raw_value" class="mt-1">
+                                    <i class="fa fa-user me-1" title="Conductor"/>
+                                    <field name="conductor_id"/>
+                                </div>
+                            </div>
+
+                            <div class="o_kanban_record_bottom mt-2 d-flex justify-content-between align-items-center">
+                                <div class="oe_kanban_bottom_left">
+                                    <span t-if="record.estado.raw_value == 'disponible'" class="badge bg-success">Disponible</span>
+                                    <span t-if="record.estado.raw_value == 'mantenimiento'" class="badge bg-warning text-dark">En Mantenimiento</span>
+                                    <span t-if="record.estado.raw_value == 'asignado'" class="badge bg-primary">Asignado</span>
+                                </div>
+                                <div class="oe_kanban_bottom_right text-end">
+                                    <div class="fw-bold">
+                                        <field name="costo_total_mantenimiento" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>
+                                    <!-- Contador integrado en la esquina inferior derecha de la tarjeta -->
+                                    <small class="text-muted">
+                                        <i class="fa fa-wrench me-1"/>
+                                        <field name="mantenimiento_count"/> servicios
+                                    <div class="fw-bold">
+                                        <field name="promedio_mantenimiento" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>    
+                                    </small>
+                                </div>
+                            </div>
+                        </main>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Vista Lista (Vehículos) -->
+    <record id="view_gestion_vehiculo_list" model="ir.ui.view">
+        <field name="name">gestion.vehiculo.list</field>
+        <field name="model">gestion.vehiculo</field>
+        <field name="arch" type="xml">
+            <list string="Vehículos">
+                <field name="image_1920" widget="image" class="oe_avatar" options="{'size': [40, 40]}"/>
+                <field name="name"/>
+                <field name="conductor_id"/>
+                <field name="marca"/>
+                <field name="modelo"/>
+                <field name="estado"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Formulario (Vehículos) -->
+    <record id="view_gestion_vehiculo_form" model="ir.ui.view">
+        <field name="name">gestion.vehiculo.form</field>
+        <field name="model">gestion.vehiculo</field>
+        <field name="arch" type="xml">
+            <form string="Vehículo">
+                <header>
+                    <button name="%(action_mantenimiento_wizard)d" 
+                            string="Registrar Mantenimiento" 
+                            type="action" 
+                            class="oe_highlight" 
+                            icon="fa-wrench"/>
+                    <field name="estado" widget="statusbar" statusbar_visible="disponible,mantenimiento,asignado"/>
+                </header>
+                <sheet>
+                    <!-- SMART BUTTON BOX CON AMBOS BOTONES -->
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Botón 1: Muestra el número de mantenimientos -->
+                        <button class="oe_stat_button" type="object" name="action_view_mantenimientos" icon="fa-wrench">
+                            <field name="mantenimiento_count" widget="statinfo" string="Servicios"/>
+                        </button>
+                        <!-- Botón 2: Muestra el gasto total en taller -->
+                        <button class="oe_stat_button" type="object" name="action_view_mantenimientos" icon="fa-usd">
+                            <field name="costo_total_mantenimiento" widget="statinfo" string="Gasto Taller"/>
+                        </button>
+                           <!-- Botón 3: Muestra el promedio total en taller -->
+                           <button class="oe_stat_button" type="object" name="action_view_mantenimientos" icon="fa-usd">
+                            <field name="promedio_mantenimiento" widget="statinfo" string="Promedio De Gasto"/>
+                        </button>
+                    </div>
+
+                    <field name="image_1920" 
+                           widget="image" 
+                           class="oe_avatar" 
+                           options="{'preview_image': 'image_1920', 'zoom': true}"/>
+                    
+                    <div class="oe_title">
+                        <label for="name" string="Matrícula / Placa"/>
+                        <h1>
+                            <field name="name" placeholder="ej. ABC-1234"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="marca"/>
+                            <field name="modelo"/>
+                            <field name="anio"/>
+                        </group>
+                        <group>
+                            <field name="conductor_id"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Mantenimientos" name="mantenimientos">
+                            <field name="mantenimiento_ids">
+                                <list>
+                                    <field name="fecha"/>
+                                    <field name="name"/>
+                                    <field name="foto_ingreso" widget="image" options="{'size': [35, 35]}"/>
+                                    <field name="foto_salida" widget="image" options="{'size': [35, 35]}"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="costo" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </list>
+                                <form string="Registro de Mantenimiento">
+                                    <sheet>
+                                        <group>
+                                            <group string="Información General">
+                                                <field name="name"/>
+                                                <field name="fecha"/>
+                                                <field name="currency_id" invisible="1"/>
+                                                <field name="costo" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                            </group>
+                                            <group string="Evidencia Fotográfica">
+                                                <field name="foto_ingreso" 
+                                                       widget="image" 
+                                                       class="oe_avatar" 
+                                                       options="{'preview_image': 'foto_ingreso', 'zoom': true}"/>
+                                                <field name="foto_salida" 
+                                                       widget="image" 
+                                                       class="oe_avatar" 
+                                                       options="{'preview_image': 'foto_salida', 'zoom': true}"/>
+                                            </group>
+                                        </group>
+                                        <group string="Detalles del Taller">
+                                            <field name="notas" placeholder="Escribe observaciones de ingreso o reparación..."/>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Notas" name="info_adicional">
+                            <field name="notas" placeholder="Escribe aquí notas sobre el vehículo..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista Búsqueda Simplificada (Valida para Odoo 19) -->
+    <record id="view_gestion_vehiculo_search" model="ir.ui.view">
+        <field name="name">gestion.vehiculo.search</field>
+        <field name="model">gestion.vehiculo</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Vehículos">
+                <field name="name"/>
+                <field name="marca"/>
+                <field name="conductor_id"/>
+                <separator/>
+                <filter string="Disponibles" name="disponibles" domain="[('estado', '=', 'disponible')]"/>
+                <filter string="En Mantenimiento" name="mantenimiento" domain="[('estado', '=', 'mantenimiento')]"/>
+                <filter string="Asignado" name="asignado" domain="[('estado', '=', 'asignado')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción de Ventana -->
+    <record id="action_gestion_vehiculo" model="ir.actions.act_window">
+        <field name="name">Flota de Vehículos</field>
+        <field name="res_model">gestion.vehiculo</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+    <!-- Menús de Navegación -->
+    <menuitem id="menu_gestion_vehiculos_root" name="Gestión Vehículos" sequence="10"/>
+    <menuitem id="menu_gestion_vehiculo_main" name="Vehículos" parent="menu_gestion_vehiculos_root" action="action_gestion_vehiculo"/>
+
+</odoo>

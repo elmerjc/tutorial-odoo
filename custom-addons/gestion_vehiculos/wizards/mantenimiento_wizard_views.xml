@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Formulario Flotante del Wizard -->
+    <record id="view_mantenimiento_wizard_form" model="ir.ui.view">
+        <field name="name">gestion.mantenimiento.wizard.form</field>
+        <field name="model">gestion.mantenimiento.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Registrar Mantenimiento">
+                <sheet>
+                    <group>
+                        <group string="Información del Servicio">
+                            <field name="vehiculo_id" readonly="1"/>
+                            <field name="name" placeholder="ej. Cambio de aceite y filtros"/>
+                            <field name="fecha"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="costo" widget="monetary" />
+                        </group>
+                        <group string="Fotos de Registro">
+                            <!-- Fotos con ZOOM en el Wizard -->
+                            <field name="foto_ingreso" 
+                                   widget="image" 
+                                   class="oe_avatar" 
+                                   options="{'zoom': true}"/>
+                            <field name="foto_salida" 
+                                   widget="image" 
+                                   class="oe_avatar" 
+                                   options="{ 'zoom': true}"/>
+                        </group>
+                    </group>
+                    <group string="Observaciones">
+                        <field name="notas" placeholder="Detalles de inspección o reparaciones efectuadas..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Guardar" name="action_registrar_mantenimiento" type="object" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acción de Ventana -->
+    <record id="action_mantenimiento_wizard" model="ir.actions.act_window">
+        <field name="name">Registrar Mantenimiento</field>
+        <field name="res_model">gestion.mantenimiento.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

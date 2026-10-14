@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_gestion_vehiculo_user,gestion.vehiculo.user,model_gestion_vehiculo,base.group_user,1,1,1,1
+access_gestion_mantenimiento_user,gestion.mantenimiento.user,model_gestion_mantenimiento,base.group_user,1,1,1,1
+access_gestion_mantenimiento_wizard_user,gestion.mantenimiento.wizard.user,model_gestion_mantenimiento_wizard,base.group_user,1,1,1,1
