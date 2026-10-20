@@ -14,13 +14,14 @@
                             </div>
                             <div class="col-4 text-end">
                                 <t t-if="doc.image_1920">
-                                    <img t-att-src="image_data_uri(doc.image_1920)" style="max-height: 120px; max-width: 150px; border-radius: 5px; border: 1px solid #ccc;"/>
+                                    <img t-att-src="image_data_uri(doc.image_1920)" 
+                                    t-att-style="'max-height: 120px; max-width: 150px; border-radius: 5px;' + ('border: 2px solid #0f9726;' if doc.estado == 'disponible' else 'border: 2px solid #ec920c;')"/>
                                 </t>
                             </div>
                         </div>
 
                         <!-- Datos Principales -->
-                        <table class="table table-bordered mb-4">
+                        <table class="table table-bordered mb-4">     
                             <tbody>
                                 <tr>
                                     <th class="bg-light" style="width: 20%;">Marca:</th>
@@ -33,12 +34,12 @@
                                     <td><t t-esc="doc.anio"/></td>
                                     <th class="bg-light">Estado:</th>
                                     <td>
-                                        <span class="badge bg-info text-dark" t-esc="doc.estado"/>
+                                        <span class="badge bg-info text-dark" t-field="doc.estado"/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">Conductor:</th>
-                                    <td colspan="3">
+                                    <td>
                                         <t t-if="doc.conductor_id">
                                             <t t-esc="doc.conductor_id.name"/>
                                         </t>
@@ -46,6 +47,8 @@
                                             <em>Sin conductor asignado</em>
                                         </t>
                                     </td>
+                                    <th class="bg-light">Moneda:</th>
+                                    <td><t t-esc="doc.currency_id.name"/></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -66,7 +69,7 @@
                                 <tbody>
                                     <t t-foreach="doc.mantenimiento_ids" t-as="m">
                                         <tr>
-                                            <td><t t-esc="m.fecha"/></td>
+                                            <td><span t-field="m.fecha"/></td>
                                             <td><t t-esc="m.name"/></td>
                                             <td class="text-center">
                                                 <t t-if="m.foto_ingreso">

@@ -42,30 +42,37 @@ class GestionVehiculo(models.Model):
     # 1. CAMPO COMPUTADO: Contador de Mantenimientos
     mantenimiento_count = fields.Integer(
         string='N° Mantenimientos',
-        compute='_compute_mantenimiento_stats'
+        compute='_compute_mantenimiento_stats',
+        store=True,
+        group_operator="sum"
     )
 
     # 2. CAMPO COMPUTADO: Costo Total Acumulado
     costo_total_mantenimiento = fields.Monetary(
         string='Total Mantenimientos',
         compute='_compute_mantenimiento_stats',
-        currency_field='currency_id'
+        currency_field='currency_id',
+        store=True,
+        group_operator="sum"
     )
-    # Campo Computado : Promedio Total
+
+    # 3. CAMPO COMPUTADO: Promedio Total por Mantenimiento
     promedio_mantenimiento = fields.Monetary(
         string='Promedio Total',
         compute='_compute_mantenimiento_stats',
-        currency_field='currency_id'
+        currency_field='currency_id',
+        store=True,
+        group_operator="avg"
     )
 
-    # Cálculo unificado de ambas métricas
+    # Cálculo unificado de las tres métricas
     @api.depends('mantenimiento_ids', 'mantenimiento_ids.costo')
     def _compute_mantenimiento_stats(self):
         for record in self:
             record.mantenimiento_count = len(record.mantenimiento_ids)
             record.costo_total_mantenimiento = sum(m.costo for m in record.mantenimiento_ids)
-            cantidad = 1 if record.mantenimiento_count == 0 else record.mantenimiento_count
-            record.promedio_mantenimiento = (record.costo_total_mantenimiento / cantidad)
+            cantidad = record.mantenimiento_count if record.mantenimiento_count > 0 else 1
+            record.promedio_mantenimiento = record.costo_total_mantenimiento / cantidad
 
     # Acción invocada por los Smart Buttons
     def action_view_mantenimientos(self):

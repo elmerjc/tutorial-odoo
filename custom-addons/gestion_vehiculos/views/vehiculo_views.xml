@@ -9,7 +9,6 @@
             <kanban class="o_kanban_mobile" sample="1" default_group_by="estado">
                 <field name="estado"/>
                 <field name="currency_id"/>
-                <!-- Se agrega el campo computado para usarlo en el template -->
                 <field name="mantenimiento_count"/>
                 <field name="costo_total_mantenimiento"/>
                 <field name="promedio_mantenimiento"/>
@@ -42,13 +41,12 @@
                                     <div class="fw-bold">
                                         <field name="costo_total_mantenimiento" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                     </div>
-                                    <!-- Contador integrado en la esquina inferior derecha de la tarjeta -->
-                                    <small class="text-muted">
+                                    <small class="text-muted d-block">
                                         <i class="fa fa-wrench me-1"/>
                                         <field name="mantenimiento_count"/> servicios
-                                    <div class="fw-bold">
-                                        <field name="promedio_mantenimiento" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                    </div>    
+                                    </small>
+                                    <small class="text-muted d-block">
+                                        Prom: <field name="promedio_mantenimiento" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                     </small>
                                 </div>
                             </div>
@@ -56,6 +54,21 @@
                     </t>
                 </templates>
             </kanban>
+        </field>
+    </record>
+
+    <!-- Vista Pivot (Análisis de Flota) -->
+    <record id="view_gestion_vehiculo_pivot" model="ir.ui.view">
+        <field name="name">gestion.vehiculo.pivot</field>
+        <field name="model">gestion.vehiculo</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Flota" display_quantity="true">
+                <field name="marca" type="row"/>
+                <field name="estado" type="col"/>
+                <field name="costo_total_mantenimiento" type="measure"/>
+                <field name="mantenimiento_count" type="measure"/>
+                <field name="promedio_mantenimiento" type="measure"/>
+            </pivot>
         </field>
     </record>
 
@@ -71,6 +84,9 @@
                 <field name="marca"/>
                 <field name="modelo"/>
                 <field name="estado"/>
+                <field name="costo_total_mantenimiento" />
+                <field name="mantenimiento_count"/>
+                <field name="promedio_mantenimiento"/>
             </list>
         </field>
     </record>
@@ -90,19 +106,16 @@
                     <field name="estado" widget="statusbar" statusbar_visible="disponible,mantenimiento,asignado"/>
                 </header>
                 <sheet>
-                    <!-- SMART BUTTON BOX CON AMBOS BOTONES -->
+                    <!-- SMART BUTTON BOX CON TRES BOTONES -->
                     <div class="oe_button_box" name="button_box">
-                        <!-- Botón 1: Muestra el número de mantenimientos -->
                         <button class="oe_stat_button" type="object" name="action_view_mantenimientos" icon="fa-wrench">
                             <field name="mantenimiento_count" widget="statinfo" string="Servicios"/>
                         </button>
-                        <!-- Botón 2: Muestra el gasto total en taller -->
                         <button class="oe_stat_button" type="object" name="action_view_mantenimientos" icon="fa-usd">
                             <field name="costo_total_mantenimiento" widget="statinfo" string="Gasto Taller"/>
                         </button>
-                           <!-- Botón 3: Muestra el promedio total en taller -->
-                           <button class="oe_stat_button" type="object" name="action_view_mantenimientos" icon="fa-usd">
-                            <field name="promedio_mantenimiento" widget="statinfo" string="Promedio De Gasto"/>
+                        <button class="oe_stat_button" type="object" name="action_view_mantenimientos" icon="fa-calculator">
+                            <field name="promedio_mantenimiento" widget="statinfo" string="Promedio Gasto"/>
                         </button>
                     </div>
 
@@ -176,7 +189,7 @@
         </field>
     </record>
 
-    <!-- Vista Búsqueda Simplificada (Valida para Odoo 19) -->
+    <!-- Vista Búsqueda Simplificada (Válida para Odoo 19) -->
     <record id="view_gestion_vehiculo_search" model="ir.ui.view">
         <field name="name">gestion.vehiculo.search</field>
         <field name="model">gestion.vehiculo</field>
@@ -197,7 +210,7 @@
     <record id="action_gestion_vehiculo" model="ir.actions.act_window">
         <field name="name">Flota de Vehículos</field>
         <field name="res_model">gestion.vehiculo</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,list,pivot,form</field>
     </record>
 
     <!-- Menús de Navegación -->
